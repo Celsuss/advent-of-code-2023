@@ -1,11 +1,35 @@
+import math
 
 BLUE = 'blue'
 RED = 'red'
 GREEN = 'green'
 
-def partTwo():
+def getProductOfBalls(balls: set()) -> int:
+    product = 0
+    for color in balls:
+        if product == 0:
+            product = balls[color]
+        else:
+            product *= balls[color]
+    return product
 
-    return
+def partTwo(games: list) -> int:
+    products = []
+    for game in games:
+        minimum_balls = {
+            RED: -math.inf,
+            GREEN: -math.inf,
+            BLUE: -math.inf
+        }
+        for record in game['records']:
+            for color in record:
+                if int(record[color]) > minimum_balls[color]:
+                    minimum_balls[color] = int(record[color])
+                continue
+        products.append(getProductOfBalls(minimum_balls))
+    
+    res = sum(products)
+    return sum(products)
 
 
 def getImpossibleGames(games: list, targets: dict()) -> set():
@@ -27,7 +51,6 @@ def getSumOfGameIds(games_ids: list) -> int:
 
 
 def partOne(games: list):
-    """ """
     targets = {
         RED: 12,
         GREEN: 13,
@@ -85,10 +108,19 @@ def main():
     assert(res == 8)
     print(f'Part one test answer: {res}')
 
+    data = getData('data/day-two-test.txt')
+    res = partTwo(data)
+    assert(res == 2286)
+    print(f'Part two test answer: {res}')
+
     """ solutions """
     data = getData('data/day-two.txt')
     res = partOne(data)
-    print(f'Part one test answer: {res}')
+    print(f'Part one answer: {res}')
+
+    data = getData('data/day-two.txt')
+    res = partTwo(data)
+    print(f'Part two answer: {res}')
 
     return 0
 
