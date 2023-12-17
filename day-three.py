@@ -1,26 +1,61 @@
 
-SYMBOLS = '!@#$%^&*()_-+={}[]'
+SYMBOLS = '!@#$%^&*()_-+={}[]/%'
 
 
-def getNumFromIndex(string: str, index: int) -> int:
+def convertStringArrayToIntArray(array: list) -> list:
+    return [int(x) for x in array]
 
-    return 0
+
+def getNumStartAndEndIndex(row: str, index: int) -> (int, int):
+    start_index = 0
+    end_index = -1
+    for i in range(index, -1, -1):
+        if row[i].isnumeric() is False:
+            start_index = i+1
+            break
+    for i in range(index, len(row)):
+        if row[i].isnumeric() is False:
+            end_index = i
+            break
+    return (start_index, end_index)
+
+
+def getAdjacantNumsInRow(row: list, index: int) -> list:
+    adjacant_nums = []
+    start_index = index-1
+    end_index = start_index
+    i = start_index
+
+    while i <= index+1 and i >= 0:
+        if i >= 0 and i <= len(row)-1 and row[i].isnumeric():
+            start_index, end_index = getNumStartAndEndIndex(row, i)
+            if end_index == -1:
+                num = row[start_index:]
+                adjacant_nums.append(num)
+                break
+
+            num = row[start_index:end_index]
+            adjacant_nums.append(num)
+            i = end_index+1
+        else:
+            i = i+1
+    return adjacant_nums
 
 
 def getAdjacantNums(schematics: list, row_i: int, char_i: int) -> list:
+    adjacant_nums = []
     """ top row"""
     if row_i > 0:
-        top =  schematics[row_i-1][char_i]
-        if char_i > 0:
-            top_left = schematics[row_i-1][char_i-1]
-        if char_i <= len(schematics[row_i])-1:
-            top_right = schematics[row_i-1][char_i+1]
+        adjacant_nums.extend(getAdjacantNumsInRow(schematics[row_i-1], char_i))
 
     """ center row """
+    adjacant_nums.extend(getAdjacantNumsInRow(schematics[row_i], char_i))
 
     """ bottom row """
+    if row_i < len(schematics)-1:
+        adjacant_nums.extend(getAdjacantNumsInRow(schematics[row_i+1], char_i))
 
-    return []
+    return adjacant_nums
 
 
 def isSymbol(char) -> bool:
@@ -38,6 +73,7 @@ def partOne(schematics: list) -> int:
             if isSymbol(char):
                 adjacant_nums = getAdjacantNums(schematics, row_i, char_i)
                 engine_parts.extend(adjacant_nums)
+    engine_parts = convertStringArrayToIntArray(engine_parts)
     return sum(engine_parts)
 
 
