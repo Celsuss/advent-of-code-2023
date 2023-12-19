@@ -42,7 +42,8 @@ def getAdjacantNumsInRow(row: list, index: int) -> list:
     return adjacant_nums
 
 
-def getAdjacantNums(schematics: list, row_i: int, char_i: int) -> list:
+def getAdjacantNums(schematics: list, row_i: int, char_i: int,
+                    adjacant_nums_count: int = None) -> list:
     adjacant_nums = []
     """ top row"""
     if row_i > 0:
@@ -55,6 +56,9 @@ def getAdjacantNums(schematics: list, row_i: int, char_i: int) -> list:
     if row_i < len(schematics)-1:
         adjacant_nums.extend(getAdjacantNumsInRow(schematics[row_i+1], char_i))
 
+    if (adjacant_nums_count is not None
+       and adjacant_nums_count != len(adjacant_nums)):
+        return []
     return adjacant_nums
 
 
@@ -62,6 +66,22 @@ def isSymbol(char) -> bool:
     if char in SYMBOLS:
         return True
     return False
+
+
+def partTwo(schematics: list) -> int:
+    gear_ratios = []
+    for row_i in range(len(schematics)):
+        row = schematics[row_i]
+        for char_i in range(len(row)):
+            char = row[char_i]
+            if isSymbol(char):
+                adjacant_nums = getAdjacantNums(schematics, row_i, char_i, 2)
+                if len(adjacant_nums) == 0:
+                    continue
+                gear_ratio = int(adjacant_nums[0]) * int(adjacant_nums[1])
+                gear_ratios.append(gear_ratio)
+    engine_parts = convertStringArrayToIntArray(gear_ratios)
+    return sum(engine_parts)
 
 
 def partOne(schematics: list) -> int:
@@ -91,10 +111,19 @@ def main():
     res = partOne(data)
     assert(res == 4361)
 
+    data = getData('data/day-three-test.txt')
+    res = partTwo(data)
+    assert(res == 467835)
+
     """ Solutions """
     data = getData('data/day-three.txt')
     res = partOne(data)
     print(f'Part one solution: {res}')
+    assert(res == 537832)
+
+    data = getData('data/day-three.txt')
+    res = partTwo(data)
+    print(f'Part two solution: {res}')
 
     return 0
 
